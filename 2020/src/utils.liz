@@ -1,0 +1,35 @@
+;; -*- clojure -*-
+
+;; Inspired by https://github.com/lukechampine/advent/blob/2f8fe4b9761f4728255e827f8c66cc69a980d458/2019/utils.zig
+
+(const std (@import "std"))
+
+(defn ^:pub ^"[]const u8" readFile [^"[]const u8" path]
+  (try
+    (const data (-> (std.fs.cwd)
+                    (.readFileAlloc std.heap.page_allocator path (std.math.maxInt usize))))
+    (catch _ _
+      (unreachable)))
+  (return (std.mem.trim u8 data "\n")))
+
+(defn ^:pub ^T parseInt [^:comptime ^type T ^"[]const u8" str]
+  (try
+    (return (std.fmt.parseInt T str 10))
+    (catch _ _ (unreachable))))
+
+(defn ^:pub ^type IntIterator[^:comptime ^type T]
+  (return
+   (struct
+      (const Self (@This))
+      ^std.mem.SplitIterator it
+
+      (fn ^:pub ^?T next [^*Self self]
+        (-> (const untrimmed (.next self.it))
+            (orelse (return nil)))
+        (const trimmed (std.mem.trim u8 untrimmed " "))
+        (if (= trimmed.len 0)
+          (return nil)
+          (return (parseInt T trimmed))))
+
+      (fn ^:pub ^Self new [^"[]const u8" in ^"[]const u8" sep]
+        (return ^Self {:it (std.mem.split in sep)})))))
