@@ -1,0 +1,43 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(defn ^:pub ^void main []
+  (const input (utils.readFile "inputs/day02.txt"))
+  (var lines_it (std.mem.tokenize input "\n"))
+  (var ^u64 part1_count 0)
+  (var ^u64 part2_count 0)
+  (while (.next lines_it)
+    (bind line
+      (var tokens_it (std.mem.tokenize line " "))
+      (var num_it (-> (.next tokens_it)
+                      (.-?)
+                      (std.mem.tokenize "-")))
+      (var min (->> (.next num_it)
+                    (.-?)
+                    (utils.parseInt u64)))
+      (var max (->> (.next num_it)
+                    (.-?)
+                    (utils.parseInt u64)))
+      (var character (-> (.next tokens_it)
+                       (.-?)
+                       (aget 0)))
+      (var password (-> (.next tokens_it)
+                        (.-?)))
+
+      (var ^u64 count 0)
+      (for [c password]
+        (when (= c character)
+          (+= count 1)))
+      (when (and (<= min count) (<= count max))
+        (+= part1_count 1))
+
+      (var first_valid (= (aget password (- min 1)) character))
+      (var second_valid (= (aget password (- max 1)) character))
+      (when (or (and first_valid (not second_valid))
+                (and (not first_valid) second_valid))
+        (+= part2_count 1))
+
+      #_(print "{} {} {} {} {}\n" [min max character password count])))
+  (print "{}\n{}\n" [part1_count part2_count]))
