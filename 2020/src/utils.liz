@@ -4,6 +4,12 @@
 
 (const std (@import "std"))
 
+(defn ^:pub ^"[]T" alloc [^:comptime ^type T ^var n]
+  (try
+    (return (.alloc std.heap.page_allocator T n))
+    (catch _ _
+      (unreachable))))
+
 (defn ^:pub ^"[]const u8" readFile [^"[]const u8" path]
   (try
     (const data (-> (std.fs.cwd)
@@ -11,6 +17,26 @@
     (catch _ _
       (unreachable)))
   (return (std.mem.trim u8 data "\n")))
+
+(defn ^:pub ^usize count [^:comptime ^type T ^"[]const T" in ^T e]
+  (var ^usize c 0)
+  (for [x in]
+    (when (= x e)
+         (+= c 1)))
+  (return c))
+
+(defn ^:pub ^"[][]const u8" splitByte [^"[]const u8" data ^u8 b]
+    (var sep ^"[_]u8" [b])
+    (var groups (alloc (zig* "[]const u8") (+ (count u8 data b) 1)))
+    (var it (std.mem.split data (slice sep 0)))
+    (for [[_ i] groups]
+      (aset groups i (-> (.next it) (orelse (unreachable)))))
+    (return groups))
+
+(defn ^:pub ^"[][]const u8" readFileLines [^"[]const u8" path]
+  (-> (readFile path)
+      (splitByte \newline)
+      (return)))
 
 (defn ^:pub ^T parseInt [^:comptime ^type T ^"[]const u8" str]
   (try

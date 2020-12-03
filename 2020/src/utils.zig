@@ -1,9 +1,40 @@
 const std = @import("std");
+pub fn alloc(comptime T: type, n: anytype) []T {
+    return std.heap.page_allocator.alloc(T, n) catch |_| {
+        unreachable;
+    };
+}
+
 pub fn readFile(path: []const u8) []const u8 {
     const data = std.fs.cwd().readFileAlloc(std.heap.page_allocator, path, std.math.maxInt(usize)) catch |_| {
         unreachable;
     };
     return std.mem.trim(u8, data, "\n");
+}
+
+pub fn count(comptime T: type, in: []const T, e: T) usize {
+    var c: usize = 0;
+    for (in) |x| {
+        if (x == e) {
+            c += 1;
+        }
+    }
+    return c;
+}
+
+pub fn splitByte(data: []const u8, b: u8) [][]const u8 {
+    var sep = [_]u8{b};
+    var groups = alloc([]const u8, (count(u8, data, b) + 1));
+    var it = std.mem.split(data, sep[0..]);
+    for (groups) |_, i| {
+        groups[i] = (it.next() orelse unreachable);
+    }
+    return groups;
+}
+
+pub fn readFileLines(path: []const u8) [][]const u8 {
+    return splitByte(readFile(path), '
+');
 }
 
 pub fn parseInt(comptime T: type, str: []const u8) T {
