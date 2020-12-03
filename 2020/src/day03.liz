@@ -8,16 +8,13 @@
   (var ^usize col 0)
   (var ^usize count 0)
 
-  (while true
-    (+= col right)
-    (+= row down)
-
-    (when (>= row lines.len)
-      (break))
-
+  (while (< row lines.len)
     (var line (aget lines row))
     (when (= (aget line (% col line.len)) \#)
-      (+= count 1)))
+      (+= count 1))
+    (+= col right)
+    (+= row down))
+
   (return count))
 
 (defn ^usize part2 [^"[][]const u8" lines ^"[][2]usize" slopes]

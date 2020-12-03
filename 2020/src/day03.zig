@@ -5,16 +5,13 @@ fn part1(lines: [][]const u8, right: usize, down: usize) usize {
     var row: usize = 0;
     var col: usize = 0;
     var count: usize = 0;
-    while (true) {
-        col += right;
-        row += down;
-        if (row >= lines.len) {
-            break;
-        }
+    while ((row < lines.len)) {
         var line = lines[row];
         if (line[(col % line.len)] == '#') {
             count += 1;
         }
+        col += right;
+        row += down;
     }
     return count;
 }
