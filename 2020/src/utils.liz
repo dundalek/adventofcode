@@ -4,6 +4,8 @@
 
 (const std (@import "std"))
 
+(const ^:pub regex (.. (@import "zig-regex/src/regex.zig") -Regex))
+
 (defn ^:pub ^"[]T" alloc [^:comptime ^type T ^var n]
   (try
     (return (.alloc std.heap.page_allocator T n))
@@ -59,3 +61,6 @@
 
       (fn ^:pub ^Self new [^"[]const u8" in ^"[]const u8" sep]
         (return ^Self {:it (std.mem.split in sep)})))))
+
+(defn ^:pub ^bool strEql [^"[]const u8" a ^"[]const u8" b]
+  (return (.eql std.mem u8 a b)))

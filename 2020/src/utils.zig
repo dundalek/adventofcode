@@ -1,4 +1,5 @@
 const std = @import("std");
+pub const regex = @import("zig-regex/src/regex.zig").Regex;
 pub fn alloc(comptime T: type, n: anytype) []T {
     return std.heap.page_allocator.alloc(T, n) catch |_| {
         unreachable;
@@ -59,4 +60,8 @@ pub fn IntIterator(comptime T: type) type {
             };
         }
     };
+}
+
+pub fn strEql(a: []const u8, b: []const u8) bool {
+    return std.mem.eql(u8, a, b);
 }

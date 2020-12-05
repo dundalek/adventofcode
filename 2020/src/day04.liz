@@ -1,0 +1,95 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(const Passport
+  (struct ^"?[]const u8" byr
+          ^"?[]const u8" iyr
+          ^"?[]const u8" eyr
+          ^"?[]const u8" hgt
+          ^"?[]const u8" hcl
+          ^"?[]const u8" ecl
+          ^"?[]const u8" pid))
+
+(defn ^void setField [^*Passport p ^"[]const u8" k ^"[]const u8" v]
+  (cond
+    (utils.strEql k "byr") (set! (.-byr p) v)
+    (utils.strEql k "iyr") (set! (.-iyr p) v)
+    (utils.strEql k "eyr") (set! (.-eyr p) v)
+    (utils.strEql k "hgt") (set! (.-hgt p) v)
+    (utils.strEql k "hcl") (set! (.-hcl p) v)
+    (utils.strEql k "ecl") (set! (.-ecl p) v)
+    (utils.strEql k "pid") (set! (.-pid p) v)))
+
+(defn ^bool hasAllFields [^*Passport p]
+  (return
+   (and (!= (.-byr p) nil)
+        (!= (.-iyr p) nil)
+        (!= (.-eyr p) nil)
+        (!= (.-hgt p) nil)
+        (!= (.-hcl p) nil)
+        (!= (.-ecl p) nil)
+        (!= (.-pid p) nil))))
+
+(defn ^bool isValidNumber [^"[]const u8" s ^usize min ^usize max]
+  (var n (utils.parseInt usize s))
+  (return
+   (and (<= min n)
+        (<= n max))))
+
+(defn ^bool reMatch [^*utils.regex re ^"[]const u8" s ^usize len]
+  (return
+    (try (and (= (.-len s) len)
+              (.match re s))
+         (catch _ _ (unreachable)))))
+
+(defn ^bool isValid [^*Passport p]
+  (var m (try (.captures hgt_re (.-hgt.? p))
+              (catch _ _ (unreachable))))
+  (return
+   (and (!= m nil)
+        (or (and (utils.strEql (.-? (.sliceAt m.? 2)) "cm")
+                 (isValidNumber (.-? (.sliceAt m.? 1)) 150 193))
+            (and (utils.strEql (.-? (.sliceAt m.? 2)) "in")
+                 (isValidNumber (.-? (.sliceAt m.? 1)) 59 76)))
+        (isValidNumber (.-byr.? p) 1920 2002)
+        (isValidNumber (.-iyr.? p) 2010 2020)
+        (isValidNumber (.-eyr.? p) 2020 2030)
+        (reMatch &hcl_re (.-hcl.? p) 7)
+        (reMatch &ecl_re (.-ecl.? p) 3)
+        (reMatch &pid_re (.-pid.? p) 9))))
+
+(var ^utils.regex hgt_re undefined)
+(var ^utils.regex hcl_re undefined)
+(var ^utils.regex ecl_re undefined)
+(var ^utils.regex pid_re undefined)
+
+(defn ^:pub ^!void main []
+  (set! hgt_re (try (utils.regex.compile std.heap.page_allocator "(\\d+)(cm|in)")))
+  (set! hcl_re (try (utils.regex.compile std.heap.page_allocator "#[0-9a-f]{6}")))
+  (set! ecl_re (try (utils.regex.compile std.heap.page_allocator "amb|blu|brn|gry|grn|hzl|oth")))
+  (set! pid_re (try (utils.regex.compile std.heap.page_allocator "\\d{9}")))
+
+  (const input (utils.readFile "inputs/day04.txt"))
+  (var it (.split std.mem input "\n\n"))
+
+  (var ^usize complete_count 0)
+  (var ^usize valid_count 0)
+
+  (while (.next it)
+    (bind passport
+      (var p ^Passport {:byr nil :iyr nil :eyr nil :hgt nil :hcl nil :ecl nil :pid nil})
+      (var token_it (.tokenize std.mem passport " :\n"))
+      (while (.next token_it)
+        (bind key
+          (setField &p key (-> token_it .next .-?))))
+
+      (when (not (hasAllFields &p))
+        (continue))
+      (+= complete_count 1)
+      (when (isValid &p)
+        (+= valid_count 1))))
+
+  (print "{}\n" [complete_count])
+  (print "{}\n" [valid_count]))
