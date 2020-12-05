@@ -1,0 +1,49 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(defn ^usize readNum [^u8 marker ^"[]const u8" s]
+  (var ^usize result 0)
+  (for [c s]
+    (var ^usize bit (if (= c marker) 1 0))
+    (set! result (| (<< result 1) bit)))
+  (return result))
+
+(const usize_asc (std.sort.asc usize))
+
+(defn ^usize intSum [^usize n]
+  (return (/ (* n (+ n 1)) 2)))
+
+(defn ^:pub ^void main []
+  (var lines (utils.readFileLines "inputs/day05.txt"))
+  (var ^usize max_id 0)
+  (var ^usize sum 0)
+  (var seats (utils.alloc usize lines.len))
+
+  (for [[line i] lines]
+    (var row (readNum \B (slice line 0 7)))
+    (var col (readNum \R (slice line 7)))
+    (var seat (+ (* row 8) col))
+
+    (set! max_id (.max std.math max_id seat))
+    (aset seats i seat)
+    (+= sum seat))
+
+  (print "{}\n" [max_id])
+
+  ;; Naive solution using sort
+  (std.sort.sort usize seats {} usize_asc)
+  (var ^usize i 1)
+  (while (< i seats.len)
+    (when (not= 1 (- (aget seats i)
+                     (aget seats (- i 1))))
+      (print "{}\n" [(- (aget seats i) 1)])
+      (break))
+    (+= i 1))
+
+  ;; Alternatively using math for more efficient solution
+  (var ^usize min_id 11)
+  (var total_sum (- (intSum max_id)
+                    (intSum min_id)))
+  (print "{}\n" [(+ (- total_sum sum) min_id)]))
