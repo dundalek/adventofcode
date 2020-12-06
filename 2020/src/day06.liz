@@ -1,0 +1,30 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(defn ^:pub ^!void main []
+  (var ^usize part1_count 0)
+  (var ^usize part2_count 0)
+
+  (const input (utils.readFile "inputs/day06.txt"))
+  (var it (.split std.mem input "\n\n"))
+  (while-some [group (.next it)]
+    (var answers (** (zig* "[_]usize{0}") (inc (- \z \a))))
+
+    (var ^usize person_count 0)
+    (var answers_it (.split std.mem group "\n"))
+    (while-some [person_answers (.next answers_it)]
+      (inc! person_count)
+      (for [c person_answers]
+        (when (and (<= \a c) (<= c \z))
+          (inc! (aget answers (- c \a))))))
+
+    (for [a answers]
+      (when (< 0 a)
+        (inc! part1_count))
+      (when (= a person_count)
+        (inc! part2_count))))
+
+  (print "{}\n" [part1_count])
+  (print "{}\n" [part2_count]))
