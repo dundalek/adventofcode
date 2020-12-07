@@ -1,0 +1,85 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(const Bag
+  (struct ^usize quantity
+          ^"[]const u8" color))
+
+(var ^utils.regex container_re undefined)
+(var ^utils.regex content_re undefined)
+
+(const BagList (std.ArrayList Bag))
+(const StrBoolMap (std.StringHashMap bool))
+(const StrUsizeMap (std.StringHashMap usize))
+(const StrBagListMap (std.StringHashMap BagList))
+
+;; Explicit error set needed for recursive functions: https://github.com/ziglang/zig/issues/763
+(const CalcErrors
+  (error OutOfMemory))
+
+(defn ^CalcErrors!bool calcHoldsShiny [^*StrBagListMap rule_map ^*StrBoolMap shiny_map ^"[]const u8" bag]
+  (if (.get shiny_map bag)
+    (bind result (return result)))
+  (var result false)
+  (for [child_bag (-> rule_map (.get bag) .-? .-items)]
+    (do
+      (const color (.-color child_bag))
+      (when (or (utils.strEql color "shiny gold")
+                (try (calcHoldsShiny rule_map shiny_map color)))
+        (set! result true)
+        (break))))
+  (try (.put shiny_map bag result))
+  (return result))
+
+(defn ^CalcErrors!usize calcContainedBags [^*StrBagListMap rule_map ^*StrUsizeMap count_map ^"[]const u8" bag]
+  (if (.get count_map bag)
+    (bind result (return result)))
+  (var ^usize contains 0)
+  (for [child_bag (-> rule_map (.get bag) .-? .-items)]
+    (do
+      (const color (.-color child_bag))
+      (var count (try (calcContainedBags rule_map count_map color)))
+      (+= contains (* (.-quantity child_bag) (inc count)))))
+  (try (.put count_map bag contains))
+  (return contains))
+
+(defn ^:pub ^!void main []
+  (set! container_re (try (utils.regex.compile std.testing.allocator "(\\w+\\s+\\w+) bags contain (.*)")))
+  (set! content_re (try (utils.regex.compile std.testing.allocator "(\\d+)\\s+(\\w+\\s+\\w+)")))
+
+  (var lines (utils.readFileLines "inputs/day07.txt"))
+  (var rules (.init StrBagListMap std.testing.allocator))
+  ;; (defer (.deinit rules))
+  ;; (try (rules.ensureCapacity (@intCast u32 lines.len)))
+
+  (for [line lines]
+    (if (try (.captures container_re line))
+      (bind captures
+        ; (defer (.deinit captures))
+        (var bag_list (.init BagList std.testing.allocator))
+        (var bag_it (std.mem.split (.-? (captures.sliceAt 2)) ", "))
+        (while-some [bag (.next bag_it)]
+          (do ; TODO: unnecessary `do` to emit extra curlies {} to compensate for compiler bug
+            (if (try (.captures content_re bag))
+              (bind bag_captures
+                (do
+                  (const b ^Bag {:quantity (utils.parseInt usize (-> bag_captures (.sliceAt 1) .-?))
+                                 :color (-> bag_captures (.sliceAt 2) .-?)})
+                  (try (.append bag_list b)))))))
+        (try (.put rules (.-? (captures.sliceAt 1)) bag_list)))))
+
+  ;; Part 1
+  (var ^usize result 0)
+  (var shiny_map (-> StrBoolMap (.init std.testing.allocator)))
+  (var it (.iterator rules))
+  (while-some [rule (.next it)]
+    (do
+      (when (try (calcHoldsShiny &rules &shiny_map (.-key rule)))
+        (inc! result))))
+  (print "{}\n" [result])
+
+  ;; Part 2
+  (var count_map (-> StrUsizeMap (.init std.testing.allocator)))
+  (print "{}\n" [(calcContainedBags &rules &count_map "shiny gold")]))
