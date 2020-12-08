@@ -1,13 +1,13 @@
 const std = @import("std");
 pub const regex = @import("zig-regex/src/regex.zig").Regex;
 pub fn alloc(comptime T: type, n: anytype) []T {
-    return std.heap.page_allocator.alloc(T, n) catch |_| {
+    return std.testing.allocator.alloc(T, n) catch |_| {
         unreachable;
     };
 }
 
 pub fn readFile(path: []const u8) []const u8 {
-    const data = std.fs.cwd().readFileAlloc(std.heap.page_allocator, path, std.math.maxInt(usize)) catch |_| {
+    const data = std.fs.cwd().readFileAlloc(std.testing.allocator, path, std.math.maxInt(usize)) catch |_| {
         unreachable;
     };
     return std.mem.trim(u8, data, "\n");

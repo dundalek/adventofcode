@@ -8,14 +8,14 @@
 
 (defn ^:pub ^"[]T" alloc [^:comptime ^type T ^var n]
   (try
-    (return (.alloc std.heap.page_allocator T n))
+    (return (.alloc std.testing.allocator T n))
     (catch _ _
       (unreachable))))
 
 (defn ^:pub ^"[]const u8" readFile [^"[]const u8" path]
   (try
     (const data (-> (std.fs.cwd)
-                    (.readFileAlloc std.heap.page_allocator path (std.math.maxInt usize))))
+                    (.readFileAlloc std.testing.allocator path (std.math.maxInt usize))))
     (catch _ _
       (unreachable)))
   (return (std.mem.trim u8 data "\n")))
@@ -24,7 +24,7 @@
   (var ^usize c 0)
   (for [x in]
     (when (= x e)
-         (+= c 1)))
+       (inc! c)))
   (return c))
 
 (defn ^:pub ^"[][]const u8" splitByte [^"[]const u8" data ^u8 b]

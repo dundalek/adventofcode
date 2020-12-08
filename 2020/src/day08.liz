@@ -1,0 +1,102 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(const InstructionType
+   (enum Acc Jmp Nop))
+
+; (const Instruction
+;   ^InstructionType
+;   (union ^isize Acc
+;          ^isize Jmp
+;          ^isize Nop))
+
+(const Instruction
+  (struct ^InstructionType inst
+          ^isize val))
+
+(defn ^isize interpret [^"[]const Instruction" instructions]
+  (var visited (utils.alloc bool instructions.len))
+  (var ^usize i 0)
+  (while-step (< i instructions.len) (inc! i)
+    (aset visited i false))
+
+  (var ^usize pc 0)
+  (var ^isize acc 0)
+  (while true
+    (when (>= pc instructions.len)
+      (break))
+    (when (aget visited pc)
+      (break))
+    (aset visited pc true)
+    (var inst (aget instructions pc))
+    ; (print "{} {} {}\n" [pc (.-inst inst) (.-val inst)])
+    (var inst_type (.-inst inst))
+    (var val (.-val inst))
+    (case inst_type
+      ;; TODO: Compiler bug, unnecessary do
+      .Acc (do (+= acc val)
+               (inc! pc))
+      .Jmp (do (set! pc (@intCast usize (+ (@intCast isize pc) val))))
+      .Nop (do (inc! pc))))
+  (return acc))
+
+(defn ^bool checkTerminates [^"[]const Instruction" instructions]
+  (var visited (utils.alloc bool instructions.len))
+  (var ^usize i 0)
+  (while-step (< i instructions.len) (inc! i)
+    (aset visited i false))
+
+  (var ^usize pc 0)
+  (var ^isize acc 0)
+  (while true
+    (when (>= pc instructions.len)
+      (return true))
+    (when (aget visited pc)
+      (return false))
+    (aset visited pc true)
+    (var inst (aget instructions pc))
+    ; (print "{} {} {}\n" [pc (.-inst inst) (.-val inst)])
+    (var inst_type (.-inst inst))
+    (var val (.-val inst))
+    (case inst_type
+      ;; TODO: Compiler bug, unnecessary do
+      .Acc (do (+= acc val)
+               (inc! pc))
+      .Jmp (do (set! pc (@intCast usize (+ (@intCast isize pc) val))))
+      .Nop (do (inc! pc)))))
+
+(defn ^void flipInst [^*Instruction inst]
+  (case (.-inst inst)
+    .Jmp (do (set! (.-inst inst) .Nop))
+    .Nop (do (set! (.-inst inst) .Jmp))
+    .Acc (do)))
+
+(defn ^:pub ^void main []
+  (var lines (utils.readFileLines "inputs/day08.txt"))
+  (var instructions (utils.alloc Instruction lines.len))
+  (var ^usize i 0)
+  (while-step (< i lines.len) (inc! i)
+    (var line (aget lines i))
+    (var inst_str (slice line 0 3))
+    (var inst
+      (cond (utils.strEql "acc" inst_str) InstructionType.Acc
+            (utils.strEql "jmp" inst_str) InstructionType.Jmp
+            (utils.strEql "nop" inst_str) InstructionType.Nop
+            :else undefined))
+    (set! (.-inst  (aget instructions i)) inst)
+    (var ^i2 sign (if (= \+ (aget (slice line 4 5) 0)) 1 -1))
+    (set! (.-val  (aget instructions i)) (* sign (utils.parseInt isize (slice line 5)))))
+
+  ;; Part 1
+  (print "{}\n" [(interpret instructions)])
+
+  ;; Part 2
+  (set! i 0)
+  (while-step (< i instructions.len) (inc! i)
+    (flipInst (& (aget instructions i)))
+    (when (checkTerminates instructions)
+      (print "{}\n" [(interpret instructions)])
+      (return))
+    (flipInst (& (aget instructions i)))))
