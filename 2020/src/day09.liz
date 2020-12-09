@@ -1,0 +1,69 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(defn ^bool checkSatisfy [^"[]const usize" preamble ^usize num]
+  (var ^usize i 0)
+  (while-step (< i preamble.len) (inc! i)
+    (var ^usize j (inc i))
+    (while-step (< j preamble.len) (inc! j)
+      (when (= num (+ (aget preamble i)
+                      (aget preamble j)))
+        (return true))))
+  (return false))
+
+(defn ^usize findMin [^"[]const usize" numbers]
+  (var ^usize min (std.math.maxInt usize))
+  (for [num numbers]
+    (when (< num min)
+      (set! min num)))
+  (return min))
+
+(defn ^usize findMax [^"[]const usize" numbers]
+  (var ^usize max 0)
+  (for [num numbers]
+    (when (< max num)
+      (set! max num)))
+  (return max))
+
+(defn ^usize findRangeSum [^"[]const usize" numbers ^usize sum]
+  (var ^usize i 0)
+  (while-step (< i numbers.len) (inc! i)
+    (var ^usize acc (aget numbers i))
+    (var ^usize j (inc i))
+    (while-step (and (< j numbers.len)
+                     (< acc sum))
+                (inc! j)
+      (+= acc (aget numbers j))
+      (when (= acc sum)
+        (var range (slice numbers i (inc j)))
+        (return (+ (findMin range) (findMax range))))))
+  (return 0))
+
+(defn ^:pub ^void main []
+  (const input (utils.readFile "inputs/day09.txt"))
+  (var numbers (utils.alloc usize (+ (utils.count u8 input \newline) 1)))
+  (var it (-> (utils.IntIterator usize) (.new input "\n")))
+  (var ^usize i 0)
+  (while-some [num (.next it)]
+    (aset numbers i num)
+    (inc! i))
+
+  (var ^"[25]usize" preamble undefined)
+  (set! i 0)
+  (while-step (< i preamble.len) (inc! i)
+    (aset preamble i (aget numbers i)))
+
+  (var ^usize part1 undefined)
+  (var ^usize j 0)
+  (while-step (< i numbers.len) (do (inc! i)
+                                    (set! j (mod (inc j) preamble.len)))
+    (var num (aget numbers i))
+    (when (not (checkSatisfy &preamble num))
+      (set! part1 num)
+      (break))
+    (aset preamble j num))
+
+  (print "{}\n" [part1])
+  (print "{}\n" [(findRangeSum numbers part1)]))
