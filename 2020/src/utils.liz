@@ -12,6 +12,9 @@
     (catch _ _
       (unreachable))))
 
+(defn ^:pub ^void free [^var x]
+  (.free std.testing.allocator x))
+
 (defn ^:pub ^"[]const u8" readFile [^"[]const u8" path]
   (try
     (const data (-> (std.fs.cwd)
@@ -39,6 +42,16 @@
   (-> (readFile path)
       (splitByte \newline)
       (return)))
+
+(defn ^:pub ^"[] T" readFileInts [^:comptime ^type T ^"[]const u8" path]
+  (var lines (-> (readFile path)
+                 (splitByte \newline)))
+  (defer (free lines))
+  (var numbers (alloc T lines.len))
+  (var ^usize i 0)
+  (while-step (< i lines.len) (inc! i)
+    (aset numbers i (parseInt T (aget lines i))))
+  (return numbers))
 
 (defn ^:pub ^T parseInt [^:comptime ^type T ^"[]const u8" str]
   (try

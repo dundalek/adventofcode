@@ -1,0 +1,50 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(const usize_asc (std.sort.asc usize))
+
+(defn ^usize part1 [^"[]const usize" adapters]
+  (var ^usize joltage 0)
+  (var ^usize diff1_count 0)
+  (var ^usize diff3_count 1) ; 1 for builtin-adapter
+  (for [adapter adapters]
+    (var diff (- adapter joltage))
+    (cond
+      (= diff 1) (do (inc! diff1_count))
+      (= diff 3) (do (inc! diff3_count)))
+    (set! joltage adapter))
+  (return (* diff1_count diff3_count)))
+
+(defn ^usize part2 [^"[]const usize" numbers]
+  ;; Allocating new slice and copying over to have initial and end joltage as nodes to avoid goofing around boundaries, could be made without it though
+  (var adapters (utils.alloc usize (+ numbers.len 2)))
+  (var visits (utils.alloc usize adapters.len))
+  (var ^usize i 0)
+  (while-step (< i numbers.len) (inc! i)
+    (aset adapters (inc i) (aget numbers i))
+    (aset visits (inc i) 0))
+  (aset adapters 0 0)
+  (aset adapters (dec adapters.len) (+ 3 (aget numbers (dec numbers.len))))
+  (aset visits 0 1)
+  (aset visits (dec visits.len) 0)
+
+  (set! i 0)
+  (while-step (< i adapters.len) (inc! i)
+    (var joltage (aget adapters i))
+    (var visited (aget visits i))
+    (var ^usize j (inc i))
+    (while-step (and (< j adapters.len)
+                     (<= (aget adapters j) (+ joltage 3)))
+                (inc! j)
+      (+= (aget visits j) visited)))
+
+  (return (aget visits (dec visits.len))))
+
+(defn ^:pub ^void main []
+  (var numbers (utils.readFileInts usize "inputs/day10.txt"))
+  (std.sort.sort usize numbers {} usize_asc)
+
+  (print "{}\n" [(part1 numbers)])
+  (print "{}\n" [(part2 numbers)]))

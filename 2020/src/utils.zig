@@ -6,6 +6,10 @@ pub fn alloc(comptime T: type, n: anytype) []T {
     };
 }
 
+pub fn free(x: anytype) void {
+    std.testing.allocator.free(x);
+}
+
 pub fn readFile(path: []const u8) []const u8 {
     const data = std.fs.cwd().readFileAlloc(std.testing.allocator, path, std.math.maxInt(usize)) catch |_| {
         unreachable;
@@ -36,6 +40,18 @@ pub fn splitByte(data: []const u8, b: u8) [][]const u8 {
 pub fn readFileLines(path: []const u8) [][]const u8 {
     return splitByte(readFile(path), '
 ');
+}
+
+pub fn readFileInts(comptime T: type, path: []const u8) []T {
+    var lines = splitByte(readFile(path), '
+');
+    defer free(lines);
+    var numbers = alloc(T, lines.len);
+    var i: usize = 0;
+    while (i < lines.len) : (i += 1) {
+        numbers[i] = parseInt(T, lines[i]);
+    }
+    return numbers;
 }
 
 pub fn parseInt(comptime T: type, str: []const u8) T {
