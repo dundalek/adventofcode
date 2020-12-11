@@ -1,0 +1,139 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(const floor \.)
+(const empty \L)
+(const occupied \#)
+
+(defn ^bool inBounds [^"[][]const u8" seats ^isize row ^isize column]
+  (return
+    (if (or (< row 0)
+            (< column 0)
+            (>= (@intCast usize row) seats.len)
+            (>= column (-> seats (aget (@intCast usize row)) .-len)))
+      false
+      true)))
+
+(defn ^usize getNeighboursOccupancy [^"[][]const u8" seats ^usize row ^usize column]
+  (var ^usize y (if (< 0 row) (dec row) 0))
+  (var ^usize occupancy 0)
+  (while-step (<= y (inc row)) (inc! y)
+    (var ^usize x (if (< 0 column) (dec column) 0))
+    (while-step (<= x (inc column)) (inc! x)
+      (when (not (and (= y row) (= x column)))
+        (var ^usize tmp (if (and (inBounds seats (@intCast isize y) (@intCast isize x))
+                                 (= occupied (aget seats y x)))
+                          1
+                          0))
+        (+= occupancy tmp))))
+  (return occupancy))
+
+(defn ^usize getTotalOccupancy [^"[][]const u8" seats]
+  (var ^usize occupancy 0)
+  (var ^usize y 0)
+  (while-step (< y seats.len) (inc! y)
+    (var ^usize x 0)
+    (while-step (< x (-> seats (aget y) .-len)) (inc! x)
+      (var ^usize tmp (if (= occupied (aget seats y x)) 1 0))
+      (+= occupancy tmp)))
+  (return occupancy))
+
+(defn ^usize iteration1 [^"[][]const u8" source ^"*[][] u8" target]
+  (var ^usize moved_seats 0)
+  (var ^usize y 0)
+  (while-step (< y source.len) (inc! y)
+    (var ^usize x 0)
+    (while-step (< x (-> source (aget y) .-len)) (inc! x)
+      (var seat (aget source y x))
+      (cond
+        (and (= seat empty) (zero? (getNeighboursOccupancy source y x)))
+        (do (inc! moved_seats)
+            (aset target.* y x occupied))
+
+        (and (= seat occupied) (<= 4 (getNeighboursOccupancy source y x)))
+        (do (inc! moved_seats)
+            (aset target.* y x empty))
+
+        :else (aset target.* y x (aget source y x)))))
+  (return moved_seats))
+
+(defn ^usize getDirectionalOccupancy [^"[][]const u8" seats ^usize row ^usize column ^isize dy ^isize dx]
+  (var y (@intCast isize row))
+  (var x (@intCast isize column))
+  (while true
+    (+= y dy)
+    (+= x dx)
+    (cond
+      (not (inBounds seats y x)) (return 0)
+      (= occupied (aget seats (@intCast usize y) (@intCast usize x))) (return 1)
+      (= empty (aget seats (@intCast usize y) (@intCast usize x))) (return 0))))
+
+(defn ^usize getDirectionalNeighboursOccupancy [^"[][]const u8" seats ^usize row ^usize column]
+  (var ^isize y -1)
+  (var ^usize occupancy 0)
+  (while-step (<= y 1) (inc! y)
+    (var ^isize x -1)
+    (while-step (<= x 1) (inc! x)
+      (when (not (and (= y 0) (= x 0)))
+        (+= occupancy (getDirectionalOccupancy seats row column y x)))))
+  (return occupancy))
+
+(defn ^usize iteration2 [^"[][]const u8" source ^"*[][] u8" target]
+  (var ^usize moved_seats 0)
+  (var ^usize y 0)
+  (while-step (< y source.len) (inc! y)
+    (var ^usize x 0)
+    (while-step (< x (-> source (aget y) .-len)) (inc! x)
+      (var seat (aget source y x))
+      (cond
+        (and (= seat empty) (zero? (getDirectionalNeighboursOccupancy source y x)))
+        (do (inc! moved_seats)
+            (aset target.* y x occupied))
+
+        (and (= seat occupied) (<= 5 (getDirectionalNeighboursOccupancy source y x)))
+        (do (inc! moved_seats)
+            (aset target.* y x empty))
+
+        :else (aset target.* y x (aget source y x)))))
+  (return moved_seats))
+
+(defn ^void printSeats [^"[][]const u8" seats]
+  (var ^usize occupancy 0)
+  (var ^usize y 0)
+  (while-step (< y seats.len) (inc! y)
+    (var ^usize x 0)
+    (while-step (< x (-> seats (aget y) .-len)) (inc! x)
+      (print "{c}" [(aget seats y x)]))
+    (print "\n" [])))
+
+(defn ^usize part1 []
+  (var buf1 (@ptrCast (zig* "*[][] u8") (& (utils.readFileLines "inputs/day11.txt"))))
+  (var buf2 (@ptrCast (zig* "*[][] u8") (& (utils.readFileLines "inputs/day11.txt"))))
+
+  (var ^usize i 0)
+  (while true
+    (inc! i)
+    (when (zero? (iteration1 buf1.* buf2))
+      (return (getTotalOccupancy buf1.*)))
+    (var tmp buf1)
+    (set! buf1 buf2)
+    (set! buf2 tmp)))
+
+(defn ^usize part2 []
+  (var buf1 (@ptrCast (zig* "*[][] u8") (& (utils.readFileLines "inputs/day11.txt"))))
+  (var buf2 (@ptrCast (zig* "*[][] u8") (& (utils.readFileLines "inputs/day11.txt"))))
+
+  (var ^usize i 0)
+  (while true
+    (inc! i)
+    (when (zero? (iteration2 buf1.* buf2))
+      (return (getTotalOccupancy buf1.*)))
+    (var tmp buf1)
+    (set! buf1 buf2)
+    (set! buf2 tmp)))
+
+(defn ^:pub ^void main []
+  (print "{}\n" [(part1)])
+  (print "{}\n" [(part2)]))
