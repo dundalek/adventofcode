@@ -10,8 +10,6 @@
     (set! result (| (<< result 1) bit)))
   (return result))
 
-(const usize_asc (std.sort.asc usize))
-
 (defn ^usize intSum [^usize n]
   (return (/ (* n (+ n 1)) 2)))
 
@@ -33,14 +31,13 @@
   (print "{}\n" [max_id])
 
   ;; Naive solution using sort
-  (std.sort.sort usize seats {} usize_asc)
+  (std.sort.sort usize seats {} (comptime (std.sort.asc usize)))
   (var ^usize i 1)
-  (while (< i seats.len)
-    (when (not= 1 (- (aget seats i)
-                     (aget seats (- i 1))))
-      (print "{}\n" [(- (aget seats i) 1)])
-      (break))
-    (+= i 1))
+  (while-step (< i seats.len) (inc! i)
+    (var ^usize seat (inc (aget seats (dec i))))
+    (when (not= seat (aget seats i))
+      (print "{}\n" [seat])
+      (break)))
 
   ;; Alternatively using math for more efficient solution
   (var ^usize min_id 11)

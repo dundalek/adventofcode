@@ -18,7 +18,7 @@ fn calcHoldsShiny(rule_map: *StrBagListMap, shiny_map: *StrBoolMap, bag: []const
     for (rule_map.get(bag).?.items) |child_bag| {
         {
             const color = child_bag.color;
-            if (utils.strEql(color, "shiny gold") or try calcHoldsShiny(rule_map, shiny_map, color)) {
+            if (utils.strEql(color, "shiny gold") or (try calcHoldsShiny(rule_map, shiny_map, color))) {
                 result = true;
                 break;
             }
@@ -34,7 +34,7 @@ fn calcContainedBags(rule_map: *StrBagListMap, count_map: *StrUsizeMap, bag: []c
     for (rule_map.get(bag).?.items) |child_bag| {
         {
             const color = child_bag.color;
-            var count = try calcContainedBags(rule_map, count_map, color);
+            var count = (try calcContainedBags(rule_map, count_map, color));
             contains += (child_bag.quantity * (count + 1));
         }
     }
@@ -43,16 +43,16 @@ fn calcContainedBags(rule_map: *StrBagListMap, count_map: *StrUsizeMap, bag: []c
 }
 
 pub fn main() !void {
-    container_re = try utils.regex.compile(std.testing.allocator, "(\\w+\\s+\\w+) bags contain (.*)");
-    content_re = try utils.regex.compile(std.testing.allocator, "(\\d+)\\s+(\\w+\\s+\\w+)");
+    container_re = (try utils.regex.compile(std.testing.allocator, "(\\w+\\s+\\w+) bags contain (.*)"));
+    content_re = (try utils.regex.compile(std.testing.allocator, "(\\d+)\\s+(\\w+\\s+\\w+)"));
     var lines = utils.readFileLines("inputs/day07.txt");
     var rules = StrBagListMap.init(std.testing.allocator);
     for (lines) |line| {
-        if (try container_re.captures(line)) |captures| {
+        if ((try container_re.captures(line))) |captures| {
             var bag_list = BagList.init(std.testing.allocator);
             var bag_it = std.mem.split(captures.sliceAt(2).?, ", ");
             while (bag_it.next()) |bag| {
-                if (try content_re.captures(bag)) |bag_captures| {
+                if ((try content_re.captures(bag))) |bag_captures| {
                     const b = Bag{
                         .color = bag_captures.sliceAt(2).?,
                         .quantity = utils.parseInt(usize, bag_captures.sliceAt(1).?),
@@ -67,7 +67,7 @@ pub fn main() !void {
     var shiny_map = StrBoolMap.init(std.testing.allocator);
     var it = rules.iterator();
     while (it.next()) |rule| {
-        if (try calcHoldsShiny(&rules, &shiny_map, rule.key)) {
+        if ((try calcHoldsShiny(&rules, &shiny_map, rule.key))) {
             result += 1;
         }
     }

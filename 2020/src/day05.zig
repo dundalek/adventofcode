@@ -10,7 +10,6 @@ fn readNum(marker: u8, s: []const u8) usize {
     return result;
 }
 
-const usize_asc = std.sort.asc(usize);
 fn intSum(n: usize) usize {
     return ((n * (n + 1)) / 2);
 }
@@ -29,14 +28,14 @@ pub fn main() void {
         sum += seat;
     }
     print("{}\n", .{max_id});
-    std.sort.sort(usize, seats, {}, usize_asc);
+    std.sort.sort(usize, seats, {}, comptime std.sort.asc(usize));
     var i: usize = 1;
-    while ((i < seats.len)) {
-        if (1 != (seats[i] - seats[(i - 1)])) {
-            print("{}\n", .{(seats[i] - 1)});
+    while (i < seats.len) : (i += 1) {
+        var seat: usize = (seats[(i - 1)] + 1);
+        if (seat != seats[i]) {
+            print("{}\n", .{seat});
             break;
         }
-        i += 1;
     }
     var min_id: usize = 11;
     var total_sum = (intSum(max_id) - intSum(min_id));

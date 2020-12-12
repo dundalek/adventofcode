@@ -29,10 +29,10 @@ pub fn count(comptime T: type, in: []const T, e: T) usize {
 
 pub fn splitByte(data: []const u8, b: u8) [][]const u8 {
     var sep = [_]u8{b};
-    var groups = alloc([]const u8, (count(u8, data, b) + 1));
+    var groups = alloc([]const u8, count(u8, data, b) + 1);
     var it = std.mem.split(data, sep[0..]);
     for (groups) |_, i| {
-        groups[i] = (it.next() orelse unreachable);
+        groups[i] = it.next() orelse unreachable;
     }
     return groups;
 }

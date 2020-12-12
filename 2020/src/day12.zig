@@ -44,9 +44,7 @@ fn part1(lines: [][]const u8) !isize {
             else => unreachable,
         }
     }
-    var va = try std.math.absInt(v);
-    var ha = try std.math.absInt(h);
-    return (va + ha);
+    return ((try std.math.absInt(v)) + (try std.math.absInt(h)));
 }
 
 fn part2(lines: [][]const u8) !isize {
@@ -92,9 +90,7 @@ fn part2(lines: [][]const u8) !isize {
             else => unreachable,
         }
     }
-    var va = try std.math.absInt(v);
-    var ha = try std.math.absInt(h);
-    return (va + ha);
+    return ((try std.math.absInt(v)) + (try std.math.absInt(h)));
 }
 
 pub fn main() !void {

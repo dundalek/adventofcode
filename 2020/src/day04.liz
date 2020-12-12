@@ -77,19 +77,17 @@
   (var ^usize complete_count 0)
   (var ^usize valid_count 0)
 
-  (while (.next it)
-    (bind passport
-      (var p ^Passport {:byr nil :iyr nil :eyr nil :hgt nil :hcl nil :ecl nil :pid nil})
-      (var token_it (.tokenize std.mem passport " :\n"))
-      (while (.next token_it)
-        (bind key
-          (setField &p key (-> token_it .next .-?))))
+  (while-some [passport (.next it)]
+    (var p ^Passport {:byr nil :iyr nil :eyr nil :hgt nil :hcl nil :ecl nil :pid nil})
+    (var token_it (.tokenize std.mem passport " :\n"))
+    (while-some [key (.next token_it)]
+      (setField &p key (-> token_it .next .-?)))
 
-      (when (not (hasAllFields &p))
-        (continue))
-      (+= complete_count 1)
-      (when (isValid &p)
-        (+= valid_count 1))))
+    (when (not (hasAllFields &p))
+      (continue))
+    (inc! complete_count)
+    (when (isValid &p)
+      (inc! valid_count)))
 
   (print "{}\n" [complete_count])
   (print "{}\n" [valid_count]))

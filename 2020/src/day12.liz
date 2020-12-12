@@ -23,9 +23,8 @@
            270 (do (-= h n))
            (unreachable))
       (unreachable)))
-  (var va (try (std.math.absInt v)))
-  (var ha (try (std.math.absInt h)))
-  (return (+ va ha)))
+  (return (+ (try (std.math.absInt v))
+             (try (std.math.absInt h)))))
 
 (defn ^!isize part2 [^"[][]const u8" lines]
   (var ^isize v 0)
@@ -50,9 +49,8 @@
       \F (do (+= v (* n wv))
              (+= h (* n wh)))
       (unreachable)))
-  (var va (try (std.math.absInt v)))
-  (var ha (try (std.math.absInt h)))
-  (return (+ va ha)))
+  (return (+ (try (std.math.absInt v))
+             (try (std.math.absInt h)))))
 
 (defn ^:pub ^!void main []
   (var lines (utils.readFileLines "inputs/day12.txt"))

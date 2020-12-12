@@ -8,12 +8,10 @@
   (var ^usize col 0)
   (var ^usize count 0)
 
-  (while (< row lines.len)
+  (while-step (< row lines.len) (do (+= col right) (+= row down))
     (var line (aget lines row))
     (when (= (aget line (% col line.len)) \#)
-      (+= count 1))
-    (+= col right)
-    (+= row down))
+      (inc! count)))
 
   (return count))
 

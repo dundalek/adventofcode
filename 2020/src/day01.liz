@@ -5,28 +5,25 @@
 
 (defn ^void part1 [^"[]const u8" input]
   (var it_a (-> (utils.IntIterator u64) (.new input "\n")))
-  (while (.next it_a)
-    (bind a
-      (var it_b (-> (utils.IntIterator u64) (.new input "\n")))
-      (while (.next it_b)
-        (bind b
-          (when (= (+ a b) 2020)
-            (print "{}\n" [(* a b)])
-            (return)))))))
+  (while-some [a (.next it_a)]
+    (var it_b (-> (utils.IntIterator u64) (.new input "\n")))
+    (while-some [b (.next it_b)]
+      (do
+        (when (= (+ a b) 2020)
+         (print "{}\n" [(* a b)])
+         (return))))))
 
 (defn ^void part2 [^"[]const u8" input]
   (var it_a (-> (utils.IntIterator u64) (.new input "\n")))
-  (while (.next it_a)
-    (bind a
-      (var it_b (-> (utils.IntIterator u64) (.new input "\n")))
-      (while (.next it_b)
-        (bind b
-          (var it_c (-> (utils.IntIterator u64) (.new input "\n")))
-          (while (.next it_c)
-            (bind c
-              (when (= (+ a b c) 2020)
-                (print "{}\n" [(* a b c)])
-                (return)))))))))
+  (while-some [a (.next it_a)]
+    (var it_b (-> (utils.IntIterator u64) (.new input "\n")))
+    (while-some [b (.next it_b)]
+      (var it_c (-> (utils.IntIterator u64) (.new input "\n")))
+      (while-some [c (.next it_c)]
+        (do
+          (when (= (+ a b c) 2020)
+            (print "{}\n" [(* a b c)])
+            (return)))))))
 
 (defn ^:pub ^void main []
   (const input (utils.readFile "inputs/day01.txt"))

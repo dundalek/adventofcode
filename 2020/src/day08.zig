@@ -35,7 +35,7 @@ fn interpret(instructions: []const Instruction) isize {
                 pc += 1;
             },
             .Jmp => {
-                pc = @intCast(usize, (@intCast(isize, pc) + val));
+                pc = @intCast(usize, @intCast(isize, pc) + val);
             },
             .Nop => {
                 pc += 1;
@@ -70,7 +70,7 @@ fn checkTerminates(instructions: []const Instruction) bool {
                 pc += 1;
             },
             .Jmp => {
-                pc = @intCast(usize, (@intCast(isize, pc) + val));
+                pc = @intCast(usize, @intCast(isize, pc) + val);
             },
             .Nop => {
                 pc += 1;
@@ -106,11 +106,11 @@ pub fn main() void {
     print("{}\n", .{interpret(instructions)});
     i = 0;
     while (i < instructions.len) : (i += 1) {
-        flipInst((&instructions[i]));
+        flipInst(&instructions[i]);
         if (checkTerminates(instructions)) {
             print("{}\n", .{interpret(instructions)});
             return;
         }
-        flipInst((&instructions[i]));
+        flipInst(&instructions[i]);
     }
 }

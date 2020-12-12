@@ -41,10 +41,10 @@ var hcl_re: utils.regex = undefined;
 var ecl_re: utils.regex = undefined;
 var pid_re: utils.regex = undefined;
 pub fn main() !void {
-    hgt_re = try utils.regex.compile(std.heap.page_allocator, "(\\d+)(cm|in)");
-    hcl_re = try utils.regex.compile(std.heap.page_allocator, "#[0-9a-f]{6}");
-    ecl_re = try utils.regex.compile(std.heap.page_allocator, "amb|blu|brn|gry|grn|hzl|oth");
-    pid_re = try utils.regex.compile(std.heap.page_allocator, "\\d{9}");
+    hgt_re = (try utils.regex.compile(std.heap.page_allocator, "(\\d+)(cm|in)"));
+    hcl_re = (try utils.regex.compile(std.heap.page_allocator, "#[0-9a-f]{6}"));
+    ecl_re = (try utils.regex.compile(std.heap.page_allocator, "amb|blu|brn|gry|grn|hzl|oth"));
+    pid_re = (try utils.regex.compile(std.heap.page_allocator, "\\d{9}"));
     const input = utils.readFile("inputs/day04.txt");
     var it = std.mem.split(input, "\n\n");
     var complete_count: usize = 0;
@@ -60,9 +60,7 @@ pub fn main() !void {
             .eyr = null,
         };
         var token_it = std.mem.tokenize(passport, " :\n");
-        while (token_it.next()) |key| {
-            setField(&p, key, token_it.next().?);
-        }
+        while (token_it.next()) |key| setField(&p, key, token_it.next().?);
         if (!hasAllFields(&p)) {
             continue;
         }

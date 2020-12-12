@@ -3,8 +3,6 @@
 (const print (.. std -debug -print))
 (const utils (@import "utils.zig"))
 
-(const usize_asc (std.sort.asc usize))
-
 (defn ^usize part1 [^"[]const usize" adapters]
   (var ^usize joltage 0)
   (var ^usize diff1_count 0)
@@ -44,7 +42,7 @@
 
 (defn ^:pub ^void main []
   (var numbers (utils.readFileInts usize "inputs/day10.txt"))
-  (std.sort.sort usize numbers {} usize_asc)
+  (std.sort.sort usize numbers {} (comptime (std.sort.asc usize)))
 
   (print "{}\n" [(part1 numbers)])
   (print "{}\n" [(part2 numbers)]))

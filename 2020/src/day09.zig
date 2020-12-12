@@ -52,8 +52,8 @@ fn findRangeSum(numbers: []const usize, sum: usize) usize {
 
 pub fn main() void {
     const input = utils.readFile("inputs/day09.txt");
-    var numbers = utils.alloc(usize, (utils.count(u8, input, '
-') + 1));
+    var numbers = utils.alloc(usize, utils.count(u8, input, '
+') + 1);
     var it = utils.IntIterator(usize).new(input, "\n");
     var i: usize = 0;
     while (it.next()) |num| {
