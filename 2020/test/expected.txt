@@ -1,0 +1,37 @@
+== src/day01.zig
+514579
+241861950
+== src/day02.zig
+2
+1
+== src/day03.zig
+7
+336
+== src/day04.zig
+2
+2
+== src/day05.zig
+850
+599
+599
+== src/day06.zig
+11
+6
+== src/day07.zig
+4
+32
+== src/day08.zig
+5
+8
+== src/day09.zig
+138879426
+23761694
+== src/day10.zig
+1917
+113387824750592
+== src/day11.zig
+37
+26
+== src/day12.zig
+25
+286
