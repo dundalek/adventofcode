@@ -1,0 +1,65 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(const Bus
+  (struct
+   ^usize num
+   ^usize offset))
+
+(defn ^"[] Bus" parse [^"[]const u8" line]
+  (var cnt (- (inc (utils.count u8 line \,))
+              (utils.count u8 line \x)))
+  (var buses (utils.alloc Bus cnt))
+  (var ^usize i 0)
+  (var ^usize offset 0)
+  (var it (std.mem.split line ","))
+  (while-some [bus_str (.next it)]
+    (when (not= (aget bus_str 0) \x)
+      (aset buses i {:num (utils.parseInt usize bus_str)
+                     :offset offset})
+      (inc! i))
+    (inc! offset))
+  (return buses))
+
+(defn ^bool cmpBusDesc [^void context ^Bus a ^Bus b]
+  (return (> (.-num a)
+             (.-num b))))
+
+(defn ^usize part1 [^usize earliest_time ^"[] Bus" buses]
+  (var ^usize min_time (std.math.maxInt usize))
+  (var ^usize min_bus undefined)
+  (for [bus buses]
+    (var num (.-num bus))
+    (var time (- num (mod earliest_time num)))
+    (when (< time min_time)
+      (set! min_time time)
+      (set! min_bus num)))
+  (return (* min_time min_bus)))
+
+(defn ^usize part2BruteForce [^"[] Bus" buses]
+  (std.sort.sort Bus buses {} cmpBusDesc)
+  (var ^usize i 1 #_(@divFloor 100000000000000 (-> buses (aget 0) .-num)))
+  (while true
+    (var t (- (* i (-> buses (aget 0) .-num))
+              (-> buses (aget 0) .-offset)))
+    (var ^usize j 1)
+    (while-step (< j buses.len) (inc! j)
+      (var num (-> buses (aget j) .-num))
+      (var offset (-> buses (aget j) .-offset))
+      (when (not (zero? (mod (+ t offset) num)))
+        (break)))
+    (when (= j buses.len)
+      (return t))
+    (inc! i)))
+
+(defn ^:pub ^!void main []
+  (var lines (utils.readFileLines "inputs/day13.txt"))
+  (var earliest_time (utils.parseInt usize (aget lines 0)))
+  (var buses (parse (aget lines 1)))
+
+  (print "{}\n" [(part1 earliest_time buses)])
+
+  ;; brute force, took ~2 hours :)
+  (print "{}\n" [(part2BruteForce buses)]))
