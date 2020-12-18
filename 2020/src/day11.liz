@@ -22,7 +22,7 @@
   (while-step (<= y (inc row)) (inc! y)
     (var ^usize x (if (< 0 column) (dec column) 0))
     (while-step (<= x (inc column)) (inc! x)
-      (when (not (and (= y row) (= x column)))
+      (when-not (and (= y row) (= x column))
         (var ^usize tmp (if (and (inBounds seats (@intCast isize y) (@intCast isize x))
                                  (= occupied (aget seats y x)))
                           1
@@ -76,7 +76,7 @@
   (while-step (<= y 1) (inc! y)
     (var ^isize x -1)
     (while-step (<= x 1) (inc! x)
-      (when (not (and (= y 0) (= x 0)))
+      (when-not (and (= y 0) (= x 0))
         (+= occupancy (getDirectionalOccupancy seats row column y x)))))
   (return occupancy))
 

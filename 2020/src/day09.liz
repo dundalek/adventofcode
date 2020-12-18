@@ -60,7 +60,7 @@
   (while-step (< i numbers.len) (do (inc! i)
                                     (set! j (mod (inc j) preamble.len)))
     (var num (aget numbers i))
-    (when (not (checkSatisfy &preamble num))
+    (when-not (checkSatisfy &preamble num)
       (set! part1 num)
       (break))
     (aset preamble j num))

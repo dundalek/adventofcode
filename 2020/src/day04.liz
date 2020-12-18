@@ -83,7 +83,7 @@
     (while-some [key (.next token_it)]
       (setField &p key (-> token_it .next .-?)))
 
-    (when (not (hasAllFields &p))
+    (when-not (hasAllFields &p)
       (continue))
     (inc! complete_count)
     (when (isValid &p)
