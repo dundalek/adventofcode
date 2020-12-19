@@ -13,7 +13,9 @@ const StrUsizeMap = std.StringHashMap(usize);
 const StrBagListMap = std.StringHashMap(BagList);
 const CalcErrors = error{OutOfMemory};
 fn calcHoldsShiny(rule_map: *StrBagListMap, shiny_map: *StrBoolMap, bag: []const u8) CalcErrors!bool {
-    if (shiny_map.get(bag)) |result| return result;
+    if (shiny_map.get(bag)) |result| {
+        return result;
+    }
     var result = false;
     for (rule_map.get(bag).?.items) |child_bag| {
         const color = child_bag.color;
@@ -27,7 +29,9 @@ fn calcHoldsShiny(rule_map: *StrBagListMap, shiny_map: *StrBoolMap, bag: []const
 }
 
 fn calcContainedBags(rule_map: *StrBagListMap, count_map: *StrUsizeMap, bag: []const u8) CalcErrors!usize {
-    if (count_map.get(bag)) |result| return result;
+    if (count_map.get(bag)) |result| {
+        return result;
+    }
     var contains: usize = 0;
     for (rule_map.get(bag).?.items) |child_bag| {
         const color = child_bag.color;
