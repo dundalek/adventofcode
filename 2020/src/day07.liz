@@ -24,12 +24,11 @@
     (bind result (return result)))
   (var result false)
   (for [child_bag (-> rule_map (.get bag) .-? .-items)]
-    (do
-      (const color (.-color child_bag))
-      (when (or (utils.strEql color "shiny gold")
-                (try (calcHoldsShiny rule_map shiny_map color)))
-        (set! result true)
-        (break))))
+    (const color (.-color child_bag))
+    (when (or (utils.strEql color "shiny gold")
+              (try (calcHoldsShiny rule_map shiny_map color)))
+      (set! result true)
+      (break)))
   (try (.put shiny_map bag result))
   (return result))
 
@@ -38,10 +37,9 @@
     (bind result (return result)))
   (var ^usize contains 0)
   (for [child_bag (-> rule_map (.get bag) .-? .-items)]
-    (do
-      (const color (.-color child_bag))
-      (var count (try (calcContainedBags rule_map count_map color)))
-      (+= contains (* (.-quantity child_bag) (inc count)))))
+    (const color (.-color child_bag))
+    (var count (try (calcContainedBags rule_map count_map color)))
+    (+= contains (* (.-quantity child_bag) (inc count))))
   (try (.put count_map bag contains))
   (return contains))
 
@@ -61,13 +59,11 @@
         (var bag_list (.init BagList std.testing.allocator))
         (var bag_it (std.mem.split (.-? (captures.sliceAt 2)) ", "))
         (while-some [bag (.next bag_it)]
-          (do ; TODO: unnecessary `do` to emit extra curlies {} to compensate for compiler bug
-            (if (try (.captures content_re bag))
-              (bind bag_captures
-                (do
-                  (const b ^Bag {:quantity (utils.parseInt usize (-> bag_captures (.sliceAt 1) .-?))
-                                 :color (-> bag_captures (.sliceAt 2) .-?)})
-                  (try (.append bag_list b)))))))
+          (if (try (.captures content_re bag))
+            (bind bag_captures
+              (const b ^Bag {:quantity (utils.parseInt usize (-> bag_captures (.sliceAt 1) .-?))
+                             :color (-> bag_captures (.sliceAt 2) .-?)})
+              (try (.append bag_list b)))))
         (try (.put rules (.-? (captures.sliceAt 1)) bag_list)))))
 
   ;; Part 1
@@ -75,9 +71,8 @@
   (var shiny_map (-> StrBoolMap (.init std.testing.allocator)))
   (var it (.iterator rules))
   (while-some [rule (.next it)]
-    (do
-      (when (try (calcHoldsShiny &rules &shiny_map (.-key rule)))
-        (inc! result))))
+    (when (try (calcHoldsShiny &rules &shiny_map (.-key rule)))
+      (inc! result)))
   (print "{}\n" [result])
 
   ;; Part 2

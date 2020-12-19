@@ -9,10 +9,10 @@ fn inBounds(seats: [][]const u8, row: isize, column: isize) bool {
 }
 
 fn getNeighboursOccupancy(seats: [][]const u8, row: usize, column: usize) usize {
-    var y: usize = if (0 < row) (row - 1) else 0;
+    var y: usize = if (0 < row) row - 1 else 0;
     var occupancy: usize = 0;
     while (y <= (row + 1)) : (y += 1) {
-        var x: usize = if (0 < column) (column - 1) else 0;
+        var x: usize = if (0 < column) column - 1 else 0;
         while (x <= (column + 1)) : (x += 1) {
             if (!((y == row) and (x == column))) {
                 var tmp: usize = if (inBounds(seats, @intCast(isize, y), @intCast(isize, x)) and (occupied == seats[y][x])) 1 else 0;

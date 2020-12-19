@@ -7,11 +7,7 @@ fn part1(adapters: []const usize) usize {
     var diff3_count: usize = 1;
     for (adapters) |adapter| {
         var diff = (adapter - joltage);
-        if (diff == 1) {
-            diff1_count += 1;
-        } else if (diff == 3) {
-            diff3_count += 1;
-        }
+        if (diff == 1) diff1_count += 1 else if (diff == 3) diff3_count += 1;
         joltage = adapter;
     }
     return (diff1_count * diff3_count);

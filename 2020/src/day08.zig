@@ -34,12 +34,8 @@ fn interpret(instructions: []const Instruction) isize {
                 acc += val;
                 pc += 1;
             },
-            .Jmp => {
-                pc = @intCast(usize, @intCast(isize, pc) + val);
-            },
-            .Nop => {
-                pc += 1;
-            },
+            .Jmp => pc = @intCast(usize, @intCast(isize, pc) + val),
+            .Nop => pc += 1,
         }
     }
     return acc;
@@ -69,24 +65,16 @@ fn checkTerminates(instructions: []const Instruction) bool {
                 acc += val;
                 pc += 1;
             },
-            .Jmp => {
-                pc = @intCast(usize, @intCast(isize, pc) + val);
-            },
-            .Nop => {
-                pc += 1;
-            },
+            .Jmp => pc = @intCast(usize, @intCast(isize, pc) + val),
+            .Nop => pc += 1,
         }
     }
 }
 
 fn flipInst(inst: *Instruction) void {
     switch (inst.inst) {
-        .Jmp => {
-            inst.inst = .Nop;
-        },
-        .Nop => {
-            inst.inst = .Jmp;
-        },
+        .Jmp => inst.inst = .Nop,
+        .Nop => inst.inst = .Jmp,
         .Acc => {},
     }
 }

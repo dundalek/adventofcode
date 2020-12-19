@@ -35,11 +35,10 @@
     (var inst_type (.-inst inst))
     (var val (.-val inst))
     (case inst_type
-      ;; TODO: Compiler bug, unnecessary do
       .Acc (do (+= acc val)
                (inc! pc))
-      .Jmp (do (set! pc (@intCast usize (+ (@intCast isize pc) val))))
-      .Nop (do (inc! pc))))
+      .Jmp (set! pc (@intCast usize (+ (@intCast isize pc) val)))
+      .Nop (inc! pc)))
   (return acc))
 
 (defn ^bool checkTerminates [^"[]const Instruction" instructions]
@@ -61,16 +60,15 @@
     (var inst_type (.-inst inst))
     (var val (.-val inst))
     (case inst_type
-      ;; TODO: Compiler bug, unnecessary do
       .Acc (do (+= acc val)
                (inc! pc))
-      .Jmp (do (set! pc (@intCast usize (+ (@intCast isize pc) val))))
-      .Nop (do (inc! pc)))))
+      .Jmp (set! pc (@intCast usize (+ (@intCast isize pc) val)))
+      .Nop (inc! pc))))
 
 (defn ^void flipInst [^*Instruction inst]
   (case (.-inst inst)
-    .Jmp (do (set! (.-inst inst) .Nop))
-    .Nop (do (set! (.-inst inst) .Jmp))
+    .Jmp (set! (.-inst inst) .Nop)
+    .Nop (set! (.-inst inst) .Jmp)
     .Acc (do)))
 
 (defn ^:pub ^void main []

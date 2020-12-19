@@ -60,7 +60,9 @@ pub fn main() !void {
             .eyr = null,
         };
         var token_it = std.mem.tokenize(passport, " :\n");
-        while (token_it.next()) |key| setField(&p, key, token_it.next().?);
+        while (token_it.next()) |key| {
+            setField(&p, key, token_it.next().?);
+        }
         if (!hasAllFields(&p)) {
             continue;
         }

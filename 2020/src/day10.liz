@@ -10,8 +10,8 @@
   (for [adapter adapters]
     (var diff (- adapter joltage))
     (cond
-      (= diff 1) (do (inc! diff1_count))
-      (= diff 3) (do (inc! diff3_count)))
+      (= diff 1) (inc! diff1_count)
+      (= diff 3) (inc! diff3_count))
     (set! joltage adapter))
   (return (* diff1_count diff3_count)))
 

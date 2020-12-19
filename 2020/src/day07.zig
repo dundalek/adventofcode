@@ -16,12 +16,10 @@ fn calcHoldsShiny(rule_map: *StrBagListMap, shiny_map: *StrBoolMap, bag: []const
     if (shiny_map.get(bag)) |result| return result;
     var result = false;
     for (rule_map.get(bag).?.items) |child_bag| {
-        {
-            const color = child_bag.color;
-            if (utils.strEql(color, "shiny gold") or (try calcHoldsShiny(rule_map, shiny_map, color))) {
-                result = true;
-                break;
-            }
+        const color = child_bag.color;
+        if (utils.strEql(color, "shiny gold") or (try calcHoldsShiny(rule_map, shiny_map, color))) {
+            result = true;
+            break;
         }
     }
     try shiny_map.put(bag, result);
@@ -32,11 +30,9 @@ fn calcContainedBags(rule_map: *StrBagListMap, count_map: *StrUsizeMap, bag: []c
     if (count_map.get(bag)) |result| return result;
     var contains: usize = 0;
     for (rule_map.get(bag).?.items) |child_bag| {
-        {
-            const color = child_bag.color;
-            var count = (try calcContainedBags(rule_map, count_map, color));
-            contains += (child_bag.quantity * (count + 1));
-        }
+        const color = child_bag.color;
+        var count = (try calcContainedBags(rule_map, count_map, color));
+        contains += (child_bag.quantity * (count + 1));
     }
     try count_map.put(bag, contains);
     return contains;
