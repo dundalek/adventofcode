@@ -1,0 +1,74 @@
+;; -*- clojure -*-
+(const std (@import "std"))
+(const print (.. std -debug -print))
+(const utils (@import "utils.zig"))
+
+(const ^usize size 10)
+
+(const Tile
+  (struct ^usize id
+          ^"[4][10] u8" edges))
+
+(defn ^void parseTile [^"[]const u8" input ^*Tile tile]
+  (var it (std.mem.split input "\n"))
+  (var first_line (-> it .next .-?))
+  (set! (.-id tile) (utils.parseInt usize (slice first_line 5 (dec first_line.len))))
+  (var ^usize i 0)
+  (while-some [line (.next it)]
+    (when (= i 0)
+      (std.mem.copy u8 (-> tile .-edges (aget 0) &) line))
+    (when (= i (dec size))
+      (std.mem.copy u8 (-> tile .-edges (aget 3) &) line))
+    (set! (-> tile .-edges (aget 1 i)) (aget line 0))
+    (set! (-> tile .-edges (aget 2 i)) (aget line (dec line.len)))
+    (inc! i)))
+
+(defn ^"[]Tile" parseTiles [^"[]const u8" input]
+  (var ^usize cnt 0)
+  (var it (std.mem.split input "\n\n"))
+  (while-some [_ (.next it)]
+    (inc! cnt))
+
+  (var tiles (utils.alloc Tile cnt))
+  (var ^usize i 0)
+  (set! it (std.mem.split input "\n\n"))
+  (while-some [tile_input (.next it)]
+    (parseTile tile_input (& (aget tiles i)))
+    (inc! i))
+  (return tiles))
+
+(defn ^bool strEqlReversed [^"[]u8 " a ^"[]u8 " b]
+    (when (not= a.len b.len)
+      (return false))
+    (for [[item index] a]
+      (when (not= item (aget b (- b.len index 1)))
+        (return false)))
+    (return true))
+
+(defn ^usize part1 [^"[]Tile" tiles]
+  (var ^usize ans 1)
+  (var ^usize i 0)
+  (while-step (< i tiles.len) (inc! i)
+    (var ^usize matched 0)
+    (dotimes [k 4]
+      (var edge_source (-> tiles (aget i) .-edges (aget k)))
+      (block :outer
+        (var ^usize j 0)
+        (while-step (< j tiles.len) (inc! j)
+          (when (= i j)
+            (continue))
+          (dotimes [l 4]
+            (var edge_target (-> tiles (aget j) .-edges (aget l)))
+            (when (or (std.mem.eql u8 &edge_source &edge_target)
+                      (strEqlReversed &edge_source &edge_target))
+              (inc! matched)
+              (break :outer))))))
+    (when (= matched 2)
+      (*= ans (-> tiles (aget i) .-id))))
+  (return ans))
+
+(defn ^:pub ^!void main []
+  (var input (utils.readFile "inputs/day20.txt"))
+  (var tiles (parseTiles input))
+
+  (print "{}\n" [(part1 tiles)]))
