@@ -6,7 +6,7 @@ const Tile = struct {
     id: usize,
     edges: [4][10]u8,
 };
-fn parseTile(input: []const u8, tile: *Tile) void {
+pub fn parseTile(input: []const u8, tile: *Tile) void {
     var it = std.mem.split(input, "\n");
     var first_line = it.next().?;
     tile.id = utils.parseInt(usize, first_line[5..(first_line.len - 1)]);
@@ -24,7 +24,7 @@ fn parseTile(input: []const u8, tile: *Tile) void {
     }
 }
 
-fn parseTiles(input: []const u8) []Tile {
+pub fn parseTiles(input: []const u8) []Tile {
     var cnt: usize = 0;
     var it = std.mem.split(input, "\n\n");
     while (it.next()) |_| {
@@ -40,7 +40,7 @@ fn parseTiles(input: []const u8) []Tile {
     return tiles;
 }
 
-fn strEqlReversed(a: []u8, b: []u8) bool {
+pub fn strEqlReversed(a: []u8, b: []u8) bool {
     if (a.len != b.len) {
         return false;
     }
@@ -52,7 +52,7 @@ fn strEqlReversed(a: []u8, b: []u8) bool {
     return true;
 }
 
-fn part1(tiles: []Tile) usize {
+pub fn part1(tiles: []Tile) usize {
     var ans: usize = 1;
     var i: usize = 0;
     while (i < tiles.len) : (i += 1) {

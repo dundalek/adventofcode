@@ -1,7 +1,7 @@
 const std = @import("std");
 const print = std.debug.print;
 const utils = @import("utils.zig");
-fn part1(lines: [][]const u8) !isize {
+pub fn part1(lines: [][]const u8) !isize {
     var v: isize = 0;
     var h: isize = 0;
     var d: isize = 90;
@@ -27,7 +27,7 @@ fn part1(lines: [][]const u8) !isize {
     return ((try std.math.absInt(v)) + (try std.math.absInt(h)));
 }
 
-fn part2(lines: [][]const u8) !isize {
+pub fn part2(lines: [][]const u8) !isize {
     var v: isize = 0;
     var h: isize = 0;
     var wv: isize = 1;
@@ -40,19 +40,25 @@ fn part2(lines: [][]const u8) !isize {
             'E' => wh += n,
             'W' => wh -= n,
             'L' => {
-                var i: usize = 0;
-                while (i < @divFloor(n, 90)) : (i += 1) {
-                    var t = wh;
-                    wh = -wv;
-                    wv = t;
+                var times = @divFloor(n, 90);
+                {
+                    var i: usize = 0;
+                    while (i < times) : (i += 1) {
+                        var t = wh;
+                        wh = -wv;
+                        wv = t;
+                    }
                 }
             },
             'R' => {
-                var i: usize = 0;
-                while (i < @divFloor(n, 90)) : (i += 1) {
-                    var t = wv;
-                    wv = -wh;
-                    wh = t;
+                var times = @divFloor(n, 90);
+                {
+                    var i: usize = 0;
+                    while (i < times) : (i += 1) {
+                        var t = wv;
+                        wv = -wh;
+                        wh = t;
+                    }
                 }
             },
             'F' => {

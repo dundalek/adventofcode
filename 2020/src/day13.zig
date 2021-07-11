@@ -5,7 +5,7 @@ const Bus = struct {
     num: usize,
     offset: usize,
 };
-fn parse(line: []const u8) []Bus {
+pub fn parse(line: []const u8) []Bus {
     var cnt = ((utils.count(u8, line, ',') + 1) - utils.count(u8, line, 'x'));
     var buses = utils.alloc(Bus, cnt);
     var i: usize = 0;
@@ -24,11 +24,11 @@ fn parse(line: []const u8) []Bus {
     return buses;
 }
 
-fn cmpBusDesc(context: void, a: Bus, b: Bus) bool {
+pub fn cmpBusDesc(context: void, a: Bus, b: Bus) bool {
     return (a.num > b.num);
 }
 
-fn part1(earliest_time: usize, buses: []Bus) usize {
+pub fn part1(earliest_time: usize, buses: []Bus) usize {
     var min_time: usize = std.math.maxInt(usize);
     var min_bus: usize = undefined;
     for (buses) |bus| {
@@ -42,7 +42,7 @@ fn part1(earliest_time: usize, buses: []Bus) usize {
     return (min_time * min_bus);
 }
 
-fn part2BruteForce(buses: []Bus) usize {
+pub fn part2BruteForce(buses: []Bus) usize {
     std.sort.sort(Bus, buses, {}, cmpBusDesc);
     var i: usize = 1;
     while (true) {

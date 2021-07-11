@@ -38,14 +38,18 @@
       \S (-= wv n)
       \E (+= wh n)
       \W (-= wh n)
-      \L (dotimes [i (@divFloor n 90)]
-           (var t wh)
-           (set! wh (- wv))
-           (set! wv t))
-      \R (dotimes [i (@divFloor n 90)]
-           (var t wv)
-           (set! wv (- wh))
-           (set! wh t))
+      \L (do
+           (var times (@divFloor n 90))
+           (dotimes [i times]
+            (var t wh)
+            (set! wh (- wv))
+            (set! wv t)))
+      \R (do
+           (var times (@divFloor n 90))
+           (dotimes [i times]
+            (var t wv)
+            (set! wv (- wh))
+            (set! wh t)))
       \F (do (+= v (* n wv))
              (+= h (* n wh)))
       (unreachable)))

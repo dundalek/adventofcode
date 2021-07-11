@@ -1,7 +1,7 @@
 const std = @import("std");
 const print = std.debug.print;
 const utils = @import("utils.zig");
-fn part1(lines: [][]const u8, right: usize, down: usize) usize {
+pub fn part1(lines: [][]const u8, right: usize, down: usize) usize {
     var row: usize = 0;
     var col: usize = 0;
     var count: usize = 0;
@@ -17,7 +17,7 @@ fn part1(lines: [][]const u8, right: usize, down: usize) usize {
     return count;
 }
 
-fn part2(lines: [][]const u8, slopes: [][2]usize) usize {
+pub fn part2(lines: [][]const u8, slopes: [][2]usize) usize {
     var result: usize = 1;
     for (slopes) |slope| {
         result *= part1(lines, slope[0], slope[1]);

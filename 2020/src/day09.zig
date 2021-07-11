@@ -1,7 +1,7 @@
 const std = @import("std");
 const print = std.debug.print;
 const utils = @import("utils.zig");
-fn checkSatisfy(preamble: []const usize, num: usize) bool {
+pub fn checkSatisfy(preamble: []const usize, num: usize) bool {
     var i: usize = 0;
     while (i < preamble.len) : (i += 1) {
         var j: usize = (i + 1);
@@ -14,7 +14,7 @@ fn checkSatisfy(preamble: []const usize, num: usize) bool {
     return false;
 }
 
-fn findMin(numbers: []const usize) usize {
+pub fn findMin(numbers: []const usize) usize {
     var min: usize = std.math.maxInt(usize);
     for (numbers) |num| {
         if (num < min) {
@@ -24,7 +24,7 @@ fn findMin(numbers: []const usize) usize {
     return min;
 }
 
-fn findMax(numbers: []const usize) usize {
+pub fn findMax(numbers: []const usize) usize {
     var max: usize = 0;
     for (numbers) |num| {
         if (max < num) {
@@ -34,7 +34,7 @@ fn findMax(numbers: []const usize) usize {
     return max;
 }
 
-fn findRangeSum(numbers: []const usize, sum: usize) usize {
+pub fn findRangeSum(numbers: []const usize, sum: usize) usize {
     var i: usize = 0;
     while (i < numbers.len) : (i += 1) {
         var acc: usize = numbers[i];

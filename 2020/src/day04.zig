@@ -10,26 +10,26 @@ const Passport = struct {
     ecl: ?[]const u8,
     pid: ?[]const u8,
 };
-fn setField(p: *Passport, k: []const u8, v: []const u8) void {
+pub fn setField(p: *Passport, k: []const u8, v: []const u8) void {
     if (utils.strEql(k, "byr")) p.byr = v else if (utils.strEql(k, "iyr")) p.iyr = v else if (utils.strEql(k, "eyr")) p.eyr = v else if (utils.strEql(k, "hgt")) p.hgt = v else if (utils.strEql(k, "hcl")) p.hcl = v else if (utils.strEql(k, "ecl")) p.ecl = v else if (utils.strEql(k, "pid")) p.pid = v;
 }
 
-fn hasAllFields(p: *Passport) bool {
+pub fn hasAllFields(p: *Passport) bool {
     return ((p.byr != null) and (p.iyr != null) and (p.eyr != null) and (p.hgt != null) and (p.hcl != null) and (p.ecl != null) and (p.pid != null));
 }
 
-fn isValidNumber(s: []const u8, min: usize, max: usize) bool {
+pub fn isValidNumber(s: []const u8, min: usize, max: usize) bool {
     var n = utils.parseInt(usize, s);
     return ((min <= n) and (n <= max));
 }
 
-fn reMatch(re: *utils.regex, s: []const u8, len: usize) bool {
+pub fn reMatch(re: *utils.regex, s: []const u8, len: usize) bool {
     return ((s.len == len) and re.match(s)) catch |_| {
         unreachable;
     };
 }
 
-fn isValid(p: *Passport) bool {
+pub fn isValid(p: *Passport) bool {
     var m = hgt_re.captures(p.hgt.?) catch |_| {
         unreachable;
     };

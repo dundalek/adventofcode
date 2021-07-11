@@ -11,8 +11,10 @@ const BagList = std.ArrayList(Bag);
 const StrBoolMap = std.StringHashMap(bool);
 const StrUsizeMap = std.StringHashMap(usize);
 const StrBagListMap = std.StringHashMap(BagList);
-const CalcErrors = error{OutOfMemory};
-fn calcHoldsShiny(rule_map: *StrBagListMap, shiny_map: *StrBoolMap, bag: []const u8) CalcErrors!bool {
+const CalcErrors = error{
+    OutOfMemory,
+};
+pub fn calcHoldsShiny(rule_map: *StrBagListMap, shiny_map: *StrBoolMap, bag: []const u8) CalcErrors!bool {
     if (shiny_map.get(bag)) |result| {
         return result;
     }
@@ -28,7 +30,7 @@ fn calcHoldsShiny(rule_map: *StrBagListMap, shiny_map: *StrBoolMap, bag: []const
     return result;
 }
 
-fn calcContainedBags(rule_map: *StrBagListMap, count_map: *StrUsizeMap, bag: []const u8) CalcErrors!usize {
+pub fn calcContainedBags(rule_map: *StrBagListMap, count_map: *StrUsizeMap, bag: []const u8) CalcErrors!usize {
     if (count_map.get(bag)) |result| {
         return result;
     }
@@ -67,7 +69,7 @@ pub fn main() !void {
     var shiny_map = StrBoolMap.init(std.testing.allocator);
     var it = rules.iterator();
     while (it.next()) |rule| {
-        if ((try calcHoldsShiny(&rules, &shiny_map, rule.key))) {
+        if ((try calcHoldsShiny(&rules, &shiny_map, rule.key_ptr.*))) {
             result += 1;
         }
     }

@@ -4,11 +4,11 @@ const utils = @import("utils.zig");
 const floor = '.';
 const empty = 'L';
 const occupied = '#';
-fn inBounds(seats: [][]const u8, row: isize, column: isize) bool {
+pub fn inBounds(seats: [][]const u8, row: isize, column: isize) bool {
     return if ((row < 0) or (column < 0) or (@intCast(usize, row) >= seats.len) or (column >= seats[@intCast(usize, row)].len)) false else true;
 }
 
-fn getNeighboursOccupancy(seats: [][]const u8, row: usize, column: usize) usize {
+pub fn getNeighboursOccupancy(seats: [][]const u8, row: usize, column: usize) usize {
     var y: usize = if (0 < row) row - 1 else 0;
     var occupancy: usize = 0;
     while (y <= (row + 1)) : (y += 1) {
@@ -23,7 +23,7 @@ fn getNeighboursOccupancy(seats: [][]const u8, row: usize, column: usize) usize 
     return occupancy;
 }
 
-fn getTotalOccupancy(seats: [][]const u8) usize {
+pub fn getTotalOccupancy(seats: [][]const u8) usize {
     var occupancy: usize = 0;
     var y: usize = 0;
     while (y < seats.len) : (y += 1) {
@@ -36,7 +36,7 @@ fn getTotalOccupancy(seats: [][]const u8) usize {
     return occupancy;
 }
 
-fn iteration1(source: [][]const u8, target: *[][]u8) usize {
+pub fn iteration1(source: [][]const u8, target: *[][]u8) usize {
     var moved_seats: usize = 0;
     var y: usize = 0;
     while (y < source.len) : (y += 1) {
@@ -55,7 +55,7 @@ fn iteration1(source: [][]const u8, target: *[][]u8) usize {
     return moved_seats;
 }
 
-fn getDirectionalOccupancy(seats: [][]const u8, row: usize, column: usize, dy: isize, dx: isize) usize {
+pub fn getDirectionalOccupancy(seats: [][]const u8, row: usize, column: usize, dy: isize, dx: isize) usize {
     var y = @intCast(isize, row);
     var x = @intCast(isize, column);
     while (true) {
@@ -65,7 +65,7 @@ fn getDirectionalOccupancy(seats: [][]const u8, row: usize, column: usize, dy: i
     }
 }
 
-fn getDirectionalNeighboursOccupancy(seats: [][]const u8, row: usize, column: usize) usize {
+pub fn getDirectionalNeighboursOccupancy(seats: [][]const u8, row: usize, column: usize) usize {
     var y: isize = -1;
     var occupancy: usize = 0;
     while (y <= 1) : (y += 1) {
@@ -79,7 +79,7 @@ fn getDirectionalNeighboursOccupancy(seats: [][]const u8, row: usize, column: us
     return occupancy;
 }
 
-fn iteration2(source: [][]const u8, target: *[][]u8) usize {
+pub fn iteration2(source: [][]const u8, target: *[][]u8) usize {
     var moved_seats: usize = 0;
     var y: usize = 0;
     while (y < source.len) : (y += 1) {
@@ -98,7 +98,7 @@ fn iteration2(source: [][]const u8, target: *[][]u8) usize {
     return moved_seats;
 }
 
-fn printSeats(seats: [][]const u8) void {
+pub fn printSeats(seats: [][]const u8) void {
     var occupancy: usize = 0;
     var y: usize = 0;
     while (y < seats.len) : (y += 1) {
@@ -110,7 +110,7 @@ fn printSeats(seats: [][]const u8) void {
     }
 }
 
-fn part1() usize {
+pub fn part1() usize {
     var buf1 = @ptrCast(*[][]u8, &utils.readFileLines("inputs/day11.txt"));
     var buf2 = @ptrCast(*[][]u8, &utils.readFileLines("inputs/day11.txt"));
     var i: usize = 0;
@@ -125,7 +125,7 @@ fn part1() usize {
     }
 }
 
-fn part2() usize {
+pub fn part2() usize {
     var buf1 = @ptrCast(*[][]u8, &utils.readFileLines("inputs/day11.txt"));
     var buf2 = @ptrCast(*[][]u8, &utils.readFileLines("inputs/day11.txt"));
     var i: usize = 0;

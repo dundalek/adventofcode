@@ -1,7 +1,7 @@
 const std = @import("std");
 const print = std.debug.print;
 const utils = @import("utils.zig");
-fn part1(adapters: []const usize) usize {
+pub fn part1(adapters: []const usize) usize {
     var joltage: usize = 0;
     var diff1_count: usize = 0;
     var diff3_count: usize = 1;
@@ -13,7 +13,7 @@ fn part1(adapters: []const usize) usize {
     return (diff1_count * diff3_count);
 }
 
-fn part2(numbers: []const usize) usize {
+pub fn part2(numbers: []const usize) usize {
     var adapters = utils.alloc(usize, numbers.len + 2);
     var visits = utils.alloc(usize, adapters.len);
     var i: usize = 0;

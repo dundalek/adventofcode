@@ -1,7 +1,7 @@
 const std = @import("std");
 const print = std.debug.print;
 const utils = @import("utils.zig");
-fn part1(input: []const u8) void {
+pub fn part1(input: []const u8) void {
     var it_a = utils.IntIterator(u64).new(input, "\n");
     while (it_a.next()) |a| {
         var it_b = utils.IntIterator(u64).new(input, "\n");
@@ -14,7 +14,7 @@ fn part1(input: []const u8) void {
     }
 }
 
-fn part2(input: []const u8) void {
+pub fn part2(input: []const u8) void {
     var it_a = utils.IntIterator(u64).new(input, "\n");
     while (it_a.next()) |a| {
         var it_b = utils.IntIterator(u64).new(input, "\n");

@@ -69,7 +69,7 @@
   (var shiny_map (-> StrBoolMap (.init std.testing.allocator)))
   (var it (.iterator rules))
   (while-some [rule (.next it)]
-    (when (try (calcHoldsShiny &rules &shiny_map (.-key rule)))
+    (when (try (calcHoldsShiny &rules &shiny_map rule.key_ptr.*))
       (inc! result)))
   (print "{}\n" [result])
 

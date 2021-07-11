@@ -10,7 +10,7 @@ const Instruction = struct {
     inst: InstructionType,
     val: isize,
 };
-fn interpret(instructions: []const Instruction) isize {
+pub fn interpret(instructions: []const Instruction) isize {
     var visited = utils.alloc(bool, instructions.len);
     var i: usize = 0;
     while (i < instructions.len) : (i += 1) {
@@ -41,7 +41,7 @@ fn interpret(instructions: []const Instruction) isize {
     return acc;
 }
 
-fn checkTerminates(instructions: []const Instruction) bool {
+pub fn checkTerminates(instructions: []const Instruction) bool {
     var visited = utils.alloc(bool, instructions.len);
     var i: usize = 0;
     while (i < instructions.len) : (i += 1) {
@@ -71,7 +71,7 @@ fn checkTerminates(instructions: []const Instruction) bool {
     }
 }
 
-fn flipInst(inst: *Instruction) void {
+pub fn flipInst(inst: *Instruction) void {
     switch (inst.inst) {
         .Jmp => inst.inst = .Nop,
         .Nop => inst.inst = .Jmp,

@@ -1,7 +1,7 @@
 const std = @import("std");
 const print = std.debug.print;
 const utils = @import("utils.zig");
-fn readNum(marker: u8, s: []const u8) usize {
+pub fn readNum(marker: u8, s: []const u8) usize {
     var result: usize = 0;
     for (s) |c| {
         var bit: usize = if (c == marker) 1 else 0;
@@ -10,7 +10,7 @@ fn readNum(marker: u8, s: []const u8) usize {
     return result;
 }
 
-fn intSum(n: usize) usize {
+pub fn intSum(n: usize) usize {
     return ((n * (n + 1)) / 2);
 }
 

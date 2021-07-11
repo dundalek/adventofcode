@@ -20,7 +20,18 @@
       (aset buses i {:num (utils.parseInt usize bus_str)
                      :offset offset})
       (inc! i))
-    (inc! offset))
+    (inc! offset)
+
+
+    #_(do
+        (if (= (aget bus_str 0) \x)
+          (do
+            (inc! offset))
+          (do
+            (aset buses i {:num (utils.parseInt usize bus_str)
+                           :offset offset})
+            (inc! i)
+            (set! offset 1)))))
   (return buses))
 
 (defn ^bool cmpBusDesc [^void context ^Bus a ^Bus b]
@@ -48,7 +59,7 @@
     (while-step (< j buses.len) (inc! j)
       (var num (-> buses (aget j) .-num))
       (var offset (-> buses (aget j) .-offset))
-      (when (not (zero? (mod (+ t offset) num)))
+      (when-not (zero? (mod (+ t offset) num))
         (break)))
     (when (= j buses.len)
       (return t))
@@ -60,6 +71,70 @@
   (var buses (parse (aget lines 1)))
 
   (print "{}\n" [(part1 earliest_time buses)])
-
-  ;; brute force, took ~2 hours :)
+  ;
+  ; ;; brute force, took ~2 hours :)
   (print "{}\n" [(part2BruteForce buses)]))
+
+
+  ; (std.sort.sort Bus buses {} cmpBusDesc)
+
+  ; (set! buses (slice buses 0 3))
+
+
+  ;; https://en.wikipedia.org/wiki/Chinese_remainder_theorem
+
+
+  ; (for [bus buses]
+  ;   (print "{} {}\n" [(.-num bus) (.-offset bus)]))
+  ;
+  ; (var ^usize j 0)
+  ; (var ^usize a (-> buses (aget j) .-num))
+  ; (var ^usize da (-> buses (aget j) .-offset))
+  ;
+  ; (inc! j)
+  ; (while-step (< j buses.len) (inc! j)
+  ;   (var ^usize b (-> buses (aget j) .-num))
+  ;   (var ^usize db (-> buses (aget j) .-offset))
+  ;   (var ^usize xa 1)
+  ;   (var ^usize xb 1)
+  ;
+  ;   (var ^usize i 0)
+  ;   (while true
+  ;     (while (< (- (* b xb) db) (- (* a xa) da))
+  ;       (inc! xb))
+  ;     (when (= (- (* b xb) db)
+  ;              (- (* a xa) da))
+  ;       (print "{}/{} {}/{}: {} {}\n" [a da b db xa xb])
+  ;       (var t (- (* a xa) da))
+  ;       (print "{}: " [t])
+  ;       (for [bus (slice buses 0 (inc j))]
+  ;         (var d (/ (+ t (.-offset bus))
+  ;                   (.-num bus)))
+  ;         (print "{}x{}-{}={} " [(.-num bus) d (.-offset bus)
+  ;                                (- (* (.-num bus) d) (.-offset bus))]))
+  ;
+  ;       (print "\n" [])
+  ;       (set! da (* b xb))
+  ;       (set! a (+ (* a b) db))
+  ;       (break))
+  ;     (inc! xa))
+  ;
+  ;   (print "{}\n" [(- (* b xb) db)])))
+
+
+  ; (var ^usize a (-> buses (aget j) .-num))
+  ; (var ^usize b (-> buses (aget (inc j)) .-num))
+  ; (var ^usize da (-> buses (aget j) .-offset))
+  ; (var ^usize db (-> buses (aget (inc j)) .-offset))
+  ; (var ^usize xa 1)
+  ; (var ^usize xb 1)
+  ;
+  ; (var ^usize i 0)
+  ; (while (< i 1)
+  ;   (while (< (- (* b xb) db) (- (* a xa) da))
+  ;     (inc! xb))
+  ;   (when (= (- (* b xb) db)
+  ;            (- (* a xa) da))
+  ;     (print "{}/{} {}/{}: {} {}\n" [a da b db xa xb])
+  ;     (inc! i))
+  ;   (inc! xa)))

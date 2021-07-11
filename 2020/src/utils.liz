@@ -6,13 +6,13 @@
 
 (const ^:pub regex (.. (@import "zig-regex/src/regex.zig") -Regex))
 
-(defn ^:pub ^"[]T" alloc [^:comptime ^type T ^var n]
+(defn ^:pub ^"[]T" alloc [^:comptime ^type T ^anytype n]
   (try
     (return (.alloc std.testing.allocator T n))
     (catch _ _
       (unreachable))))
 
-(defn ^:pub ^void free [^var x]
+(defn ^:pub ^void free [^anytype x]
   (.free std.testing.allocator x))
 
 (defn ^:pub ^"[]const u8" readFile [^"[]const u8" path]
