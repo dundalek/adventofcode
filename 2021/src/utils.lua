@@ -12,13 +12,21 @@ function M.num_iter(filename)
   end
 end
 
-function M.read_nums_to_table(filename)
-  local ret = {}
-  for n in M.num_iter(filename) do
-    table.insert(ret, n)
+function M.iter_to_table(iter)
+  local tbl = {}
+  for x in iter do
+    table.insert(tbl, x)
   end
-  return ret
+  return tbl
 end
+
+-- function M.read_nums_to_table(filename)
+--   local ret = {}
+--   for n in M.num_iter(filename) do
+--     table.insert(ret, n)
+--   end
+--   return ret
+-- end
 
 function M.read_file(filename)
   local f = io.open(filename)
@@ -35,6 +43,15 @@ function M.parse_numbers(input)
       return tonumber(match)
     end
   end
+end
+
+function M.read_nums_to_table(filename)
+  return M.iter_to_table(M.parse_numbers(M.read_file(filename)))
+end
+
+
+function M.parse_numbers_values(input)
+  return unpack(M.iter_to_table(M.parse_numbers(input)))
 end
 
 return M
