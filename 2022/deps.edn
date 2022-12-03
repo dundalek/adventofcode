@@ -1,6 +1,9 @@
-{:deps {com.hyperfiddle/rcf {:mvn/version "20220926-202227"}}
+{:deps {com.hyperfiddle/rcf {:mvn/version "20220926-202227"}
+        org.typedclojure/typed.clj.checker {:mvn/version "1.0.32"}}
 
  :aliases {:test
            {:extra-deps {lambdaisland/kaocha {:mvn/version "1.71.1119"}}
             :main-opts ["-m" "kaocha.runner"]
             :jvm-opts ["-Dhyperfiddle.rcf.generate-tests=true"]}}}
+
+
